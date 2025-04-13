@@ -2,7 +2,7 @@
   "name": "storeit-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://rahul.github.io/storeit",
+  "homepage": "https://rahul-lodha.github.io/storeIt",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
