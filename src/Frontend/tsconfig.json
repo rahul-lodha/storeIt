@@ -18,15 +18,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "baseUrl": ".",
-    "paths": {
-      "@mui/*": ["node_modules/@mui/*", "dependencies/node_modules/@mui/*"],
-      "@emotion/*": ["node_modules/@emotion/*", "dependencies/node_modules/@emotion/*"],
-      "react": ["node_modules/react", "dependencies/node_modules/react"],
-      "react-dom": ["node_modules/react-dom", "dependencies/node_modules/react-dom"],
-      "*": ["node_modules/*", "dependencies/node_modules/*"]
-    }
+    "jsx": "preserve",
+    "baseUrl": "src"
   },
   "include": [
     "src",

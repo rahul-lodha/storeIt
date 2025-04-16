@@ -8,7 +8,6 @@ interface SettingsState {
 }
 
 const Settings: React.FC = () => {
-  const { mode } = useThemeContext();
   
   const [settings, setSettings] = useState<SettingsState>({
     notifications: false,
@@ -104,4 +103,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings; 
+export default Settings;

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useMemo, useContext, useEffect } from 'react';
+import React, { createContext, useState, useMemo, useContext } from 'react';
 import { ThemeProvider, createTheme, CssBaseline, PaletteMode } from '@mui/material';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -63,7 +63,10 @@ function App() {
 
   // Get Google OAuth Client ID from environment variables
   // If not available, use a placeholder (will show an error in the console)
-  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_OAUTH_CLIENT_ID';
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || 'default-client-id';
+
+  // Log the Google Client ID to verify it is being loaded correctly
+  console.log('Google Client ID:', process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
@@ -91,6 +94,11 @@ function App() {
               <Route path="/storage" element={
                 <ProtectedRoute>
                   <Storage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <Dashboard />
                 </ProtectedRoute>
               } />
             </Routes>

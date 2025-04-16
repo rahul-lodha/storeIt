@@ -21,6 +21,8 @@ const Login: React.FC = () => {
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
+  console.log('Google Client ID:', process.env.REACT_APP_GOOGLE_CLIENT_ID);
+
   const handleEmailLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -151,4 +153,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

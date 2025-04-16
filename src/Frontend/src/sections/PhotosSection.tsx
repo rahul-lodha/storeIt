@@ -4,7 +4,6 @@ import {
   Typography,
   ImageList,
   ImageListItem,
-  IconButton,
   Dialog,
   DialogContent,
   DialogActions,
@@ -275,4 +274,4 @@ const PhotosSection: React.FC = () => {
   );
 };
 
-export default PhotosSection; 
+export default PhotosSection;

@@ -1,4 +1,4 @@
-import React, { useState, useContext, ChangeEvent } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Box,
   Typography,
@@ -93,14 +93,13 @@ const initialFiles: File[] = [
 const FilesSection: React.FC = () => {
   const { provider, storageData } = useContext(StorageProviderContext);
   const [files, setFiles] = useState<File[]>(initialFiles);
-  const [searchTerm, setSearchTerm] = useState('');
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [currentFile, setCurrentFile] = useState<number | null>(null);
   const [isDownloading, setIsDownloading] = useState<number | null>(null);
 
   // Filter files based on selected provider and search term
   const filteredFiles = files
-    .filter((file: File) => file.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((file: File) => file.name.toLowerCase().includes(''))
     .filter((file: File) => provider === 'all' ? true : file.provider === provider);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>, id: number) => {
@@ -182,12 +181,12 @@ const FilesSection: React.FC = () => {
         }}>
           <CloudIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h6" color="text.secondary">
-            {searchTerm 
+            {'' 
               ? "No files found matching your search" 
               : `No files found in ${getProviderLabel(provider)}`}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {searchTerm 
+            {'' 
               ? "Try a different search term" 
               : "Select a different storage provider to view files"}
           </Typography>
@@ -269,4 +268,4 @@ const FilesSection: React.FC = () => {
   );
 };
 
-export default FilesSection; 
+export default FilesSection;
