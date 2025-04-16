@@ -1,6 +1,6 @@
 import React, { createContext, useState, useMemo, useContext } from 'react';
 import { ThemeProvider, createTheme, CssBaseline, PaletteMode } from '@mui/material';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import MobileLayout from './components/MobileLayout';
 import Login from './pages/Login';
@@ -73,7 +73,7 @@ function App() {
       <ThemeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <BrowserRouter>
+          <Router>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={
@@ -102,7 +102,7 @@ function App() {
                 </ProtectedRoute>
               } />
             </Routes>
-          </BrowserRouter>
+          </Router>
         </ThemeProvider>
       </ThemeContext.Provider>
     </GoogleOAuthProvider>
