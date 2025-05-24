@@ -15,16 +15,28 @@ import java.util.List;
 @RequestMapping("/cloud-storage")
 public class CloudStorageController {
 
-    @Autowired
-    private CloudStorageService googleDriveService;
+  @Autowired
+  private CloudStorageService googleDriveService;
 
-    @GetMapping("/google-drive/files")
-    public List<String> listGoogleDriveFiles() {
-        return googleDriveService.listFiles("google");
-    }
+  @GetMapping("/files")
+  public List<String> listFiles() {
+    return googleDriveService.listFiles("google");
+  }
 
-    @PostMapping("/google-drive/upload")
-    public String uploadFileToGoogleDrive(@RequestParam("file") MultipartFile file) {
-        return googleDriveService.uploadFile("google", file);
-    }
+  @GetMapping("/photos")
+  public List<String> listPhotos() {
+    return googleDriveService.listPhotos("google");
+  }
+
+  @GetMapping("/videos")
+  public List<String> listVideos() {
+    return googleDriveService.listVideos("google");
+  }
+
+  @PostMapping("/upload")
+  public String uploadFile(@RequestParam("file") MultipartFile file) {
+    return googleDriveService.uploadFile("google", file);
+  }
+
 }
+

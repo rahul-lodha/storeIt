@@ -36,73 +36,46 @@ import {
   getColorByUsage 
 } from '../components/MobileLayout';
 
-// File interface with provider
+// File interface (assuming FileData from Storage.tsx is compatible or needs import)
+// If FileData is defined elsewhere, import it. Otherwise, define or adjust this interface.
+// For now, using the existing File interface, assuming FileData matches its structure.
 interface File {
-  id: number;
+  id: number | string; // Allow string ID if backend provides it
   name: string;
-  type: string;
-  size: string;
-  date: string;
-  provider: StorageProvider;
+  type?: string; // Made type optional to match DataItem
+  size?: string; // Made size optional to match DataItem
+  date?: string; // Made date optional to match DataItem
+  provider?: StorageProvider | string; // Made provider optional to match DataItem
+  // Add other fields from FileData if necessary
 }
 
-// Sample file data
-const initialFiles: File[] = [
-  {
-    id: 1,
-    name: 'Project Proposal.pdf',
-    type: 'pdf',
-    size: '2.4 MB',
-    date: '2023-10-15',
-    provider: 'device'
-  },
-  {
-    id: 2,
-    name: 'Budget Spreadsheet.xlsx',
-    type: 'spreadsheet',
-    size: '1.1 MB',
-    date: '2023-09-28',
-    provider: 'google-drive'
-  },
-  {
-    id: 3,
-    name: 'Meeting Notes.docx',
-    type: 'doc',
-    size: '325 KB',
-    date: '2023-08-14',
-    provider: 'onedrive'
-  },
-  {
-    id: 4,
-    name: 'ReadMe.txt',
-    type: 'text',
-    size: '4 KB',
-    date: '2023-07-22',
-    provider: 'dropbox'
-  },
-  {
-    id: 5,
-    name: 'script.js',
-    type: 'code',
-    size: '18 KB',
-    date: '2023-11-05',
-    provider: 'device'
-  }
-];
+// Define Props interface
+interface FilesSectionProps {
+  files: File[]; // Expect files prop
+}
 
-const FilesSection: React.FC = () => {
+// Use the props interface in the component definition
+const FilesSection: React.FC<FilesSectionProps> = ({ files: filesProp }) => { // Destructure files prop
   const { provider, storageData } = useContext(StorageProviderContext);
-  const [files, setFiles] = useState<File[]>(initialFiles);
+  // Remove internal files state, use the prop instead
+  // const [files, setFiles] = useState<File[]>(initialFiles); 
+  const [localFiles, setLocalFiles] = useState<File[]>(filesProp); // Keep local state for deletion if needed
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [currentFile, setCurrentFile] = useState<number | null>(null);
-  const [isDownloading, setIsDownloading] = useState<number | null>(null);
+  const [currentFile, setCurrentFile] = useState<number | string | null>(null);
+  const [isDownloading, setIsDownloading] = useState<number | string | null>(null);
 
-  // Filter files based on selected provider and search term
-  const filteredFiles = files
-    .filter((file: File) => file.name.toLowerCase().includes(''))
-    .filter((file: File) => provider === 'all' ? true : file.provider === provider);
+  // Update localFiles when filesProp changes
+  React.useEffect(() => {
+    setLocalFiles(filesProp);
+  }, [filesProp]);
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>, id: number) => {
+
+  // Filter files based on selected provider and search term, using localFiles state
+  const filteredFiles = localFiles
+    .filter((file: File) => file.name.toLowerCase().includes('')) // Add search term logic if needed
+    .filter((file: File) => provider === 'all' ? true : file.provider === provider); // Provider filtering might need adjustment based on actual provider data
+
+  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>, id: number | string) => {
     event.stopPropagation();
     setMenuAnchorEl(event.currentTarget);
     setCurrentFile(id);
@@ -112,17 +85,20 @@ const FilesSection: React.FC = () => {
     setMenuAnchorEl(null);
   };
 
-  const handleDeleteFile = (id: number | null) => {
+  // Deletion now modifies the local state. Consider lifting state up if needed.
+  const handleDeleteFile = (id: number | string | null) => {
     if (id === null) return;
-    setFiles(files.filter((file: File) => file.id !== id));
+    setLocalFiles(prevFiles => prevFiles.filter((file: File) => file.id !== id));
     handleCloseMenu();
+    // TODO: Add API call to delete the file on the backend
   };
 
-  const handleDownloadFile = (id: number | null) => {
+  const handleDownloadFile = (id: number | string | null) => {
     if (id === null) return;
     setIsDownloading(id);
     
     // Simulate download
+    // TODO: Implement actual download logic
     setTimeout(() => {
       setIsDownloading(null);
       handleCloseMenu();
@@ -138,28 +114,30 @@ const FilesSection: React.FC = () => {
     switch (action) {
       case 'download': handleDownloadFile(currentFile); break;
       case 'delete': handleDeleteFile(currentFile); break;
-      case 'share': handleCloseMenu(); break;
+      case 'share': handleCloseMenu(); break; // TODO: Implement share logic
       default: handleCloseMenu();
     }
   };
 
-  const getFileIcon = (type: string) => {
-    switch (type) {
-      case 'pdf': return <PdfIcon sx={{ color: '#e53935' }} />;
-      case 'spreadsheet': return <SpreadsheetIcon sx={{ color: '#43a047' }} />;
-      case 'doc': return <DocIcon sx={{ color: '#1e88e5' }} />;
-      case 'text': return <TextIcon sx={{ color: '#757575' }} />;
-      case 'code': return <CodeIcon sx={{ color: '#f57c00' }} />;
-      default: return <DocIcon />;
-    }
+  // This function needs adjustment based on actual file data (e.g., mime types)
+  const getFileIcon = (type: string | undefined) => {
+    if (!type) return <DocIcon />;
+    if (type.includes('pdf')) return <PdfIcon sx={{ color: '#e53935' }} />;
+    if (type.includes('spreadsheet') || type.includes('excel')) return <SpreadsheetIcon sx={{ color: '#43a047' }} />;
+    if (type.includes('document') || type.includes('word')) return <DocIcon sx={{ color: '#1e88e5' }} />;
+    if (type.includes('text')) return <TextIcon sx={{ color: '#757575' }} />;
+    if (type.includes('javascript') || type.includes('typescript')) return <CodeIcon sx={{ color: '#f57c00' }} />;
+    // Add more types as needed
+    return <DocIcon />;
   };
   
   return (
     <Box sx={{ p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">
-          My Files ({filteredFiles.length})
+          My Files ({filteredFiles.length}) 
         </Typography>
+        {/* Storage usage display might need adjustment based on actual data */}
         <Tooltip title={`${storageData.used} GB of ${storageData.total} GB used`} arrow>
           <Chip 
             label={`${storageData.used} GB / ${storageData.total} GB`} 
@@ -171,34 +149,34 @@ const FilesSection: React.FC = () => {
       </Box>
 
       {filteredFiles.length === 0 ? (
-        <Box sx={{ 
+         <Box sx={{ 
           display: 'flex', 
           flexDirection: 'column', 
           alignItems: 'center', 
           justifyContent: 'center',
-          height: '50vh',
+          height: '50vh', // Adjust height as needed
           textAlign: 'center' 
         }}>
           <CloudIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h6" color="text.secondary">
-            {'' 
-              ? "No files found matching your search" 
-              : `No files found in ${getProviderLabel(provider)}`}
+            {/* Adjust empty state message */}
+            {provider === 'all' ? "No files found" : `No files found in ${getProviderLabel(provider)}`}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {'' 
-              ? "Try a different search term" 
-              : "Select a different storage provider to view files"}
+            {/* Adjust empty state guidance */}
+             {provider === 'all' ? "Try selecting a specific provider" : "Upload files or select a different provider"}
           </Typography>
         </Box>
       ) : (
         <List sx={{ bgcolor: 'background.paper' }}>
-          {filteredFiles.map((file: File) => (
+          {/* Use filteredFiles derived from props */}
+          {filteredFiles.map((file: File) => ( 
             <React.Fragment key={file.id}>
               <ListItem alignItems="flex-start">
                 <ListItemAvatar>
                   <Avatar>
-                    {getFileIcon(file.type)}
+                    {/* Adjust getFileIcon based on actual data */}
+                    {getFileIcon(file.type)} 
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
@@ -207,11 +185,12 @@ const FilesSection: React.FC = () => {
                       <Typography noWrap component="span" sx={{ mr: 1 }}>
                         {file.name}
                       </Typography>
-                      <Chip 
-                        label={getProviderLabel(file.provider)}
+                      {/* Chip logic might need adjustment based on file.provider data */}
+                       <Chip 
+                        label={getProviderLabel(file.provider as StorageProvider)} // Cast might be needed
                         size="small"
                         sx={{ 
-                          backgroundColor: providerColors[file.provider as keyof typeof providerColors],
+                          backgroundColor: providerColors[file.provider as keyof typeof providerColors], // Cast might be needed
                           color: 'white',
                           fontSize: '0.6rem',
                           height: 20
@@ -226,9 +205,11 @@ const FilesSection: React.FC = () => {
                         color="text.primary"
                         component="span"
                       >
-                        {file.size}
+                        {/* Adjust size/date display based on actual data */}
+                        {file.size} 
                       </Typography>
-                      {` • ${file.date}`}
+                      {/* Adjust date display */}
+                      {` • ${file.date}`} 
                     </React.Fragment>
                   }
                 />

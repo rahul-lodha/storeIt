@@ -47,22 +47,20 @@ import {
 import { useThemeContext } from '../App';
 import { useNavigate } from 'react-router-dom';
 
-// Lazy load the sections
+// Keep lazy loading for potential use by parent
 const PhotosSection = React.lazy(() => import('../sections/PhotosSection'));
 const VideosSection = React.lazy(() => import('../sections/VideosSection'));
 const FilesSection = React.lazy(() => import('../sections/FilesSection'));
 
-// Loading fallback
+// Loading fallback remains the same
 const SectionLoader = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', p: 4 }}>
     <CircularProgress />
   </Box>
 );
 
-// Cloud provider type
+// Exported types and helpers remain the same
 export type StorageProvider = 'all' | 'device' | 'google-drive' | 'onedrive' | 'dropbox' | 'icloud' | 'jio-cloud';
-
-// Provider colors for UI across app
 export const providerColors: Record<StorageProvider, string> = {
   'all': '#607d8b',
   'device': '#4caf50',
@@ -72,8 +70,6 @@ export const providerColors: Record<StorageProvider, string> = {
   'icloud': '#A2AAAD',
   'jio-cloud': '#8EC928'
 };
-
-// Helper function to get provider label - exported for reuse
 export const getProviderLabel = (provider: StorageProvider): string => {
   switch(provider) {
     case 'all': return 'All Storage';
@@ -86,18 +82,14 @@ export const getProviderLabel = (provider: StorageProvider): string => {
     default: return 'Unknown';
   }
 };
-
-// Get color by usage percentage - exported for reuse
 export const getColorByUsage = (used: number, total: number) => {
   const percentage = (used / total) * 100;
   if (percentage > 90) return 'error';
   if (percentage > 70) return 'warning';
   return 'primary';
 };
-
-// Helper function to render provider icons - exported for reuse
 export const renderProviderIcon = (provider: StorageProvider) => {
-  switch(provider) {
+   switch(provider) {
     case 'all': return <CloudIcon />;
     case 'device': return <DeviceIcon />;
     case 'google-drive': return <GoogleDriveIcon sx={{ color: '#4285F4' }} />;
@@ -108,15 +100,7 @@ export const renderProviderIcon = (provider: StorageProvider) => {
     default: return <CloudIcon />;
   }
 };
-
-// Storage data for each provider
-export interface StorageData {
-  used: number;
-  total: number;
-  itemCount: number;
-}
-
-// Storage data by provider
+export interface StorageData { used: number; total: number; itemCount: number; }
 const storageDataByProvider: Record<StorageProvider, StorageData> = {
   'all': { used: 22.5, total: 130, itemCount: 65 },
   'device': { used: 10.2, total: 32, itemCount: 42 },
@@ -126,8 +110,6 @@ const storageDataByProvider: Record<StorageProvider, StorageData> = {
   'icloud': { used: 0, total: 5, itemCount: 0 },
   'jio-cloud': { used: 0, total: 10, itemCount: 0 }
 };
-
-// Create a context for the selected provider
 export const StorageProviderContext = React.createContext<{
   provider: StorageProvider;
   setProvider: (provider: StorageProvider) => void;
@@ -138,10 +120,18 @@ export const StorageProviderContext = React.createContext<{
   storageData: storageDataByProvider['all']
 });
 
-const MobileLayout: React.FC = () => {
+// Define props for MobileLayout
+interface MobileLayoutProps {
+  children: React.ReactNode; // To render the active section passed from parent
+  tabValue: number;         // Current tab index controlled by parent
+  onTabChange: (event: React.SyntheticEvent, newValue: number) => void; // Handler passed from parent
+}
+
+// Use the props interface
+const MobileLayout: React.FC<MobileLayoutProps> = ({ children, tabValue, onTabChange }) => {
   const { toggleColorMode } = useThemeContext();
   const navigate = useNavigate();
-  const [tabValue, setTabValue] = useState(0);
+  // Remove internal tabValue state: const [tabValue, setTabValue] = useState(0);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<StorageProvider>('all');
@@ -149,71 +139,48 @@ const MobileLayout: React.FC = () => {
   const [backupTarget, setBackupTarget] = useState<StorageProvider>('google-drive');
   const [backupInProgress, setBackupInProgress] = useState(false);
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
+  // Remove internal handleTabChange: const handleTabChange = ...
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
   };
-
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
   };
-
   const handleThemeToggle = () => {
     toggleColorMode();
     handleMenuClose();
   };
-
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
-
   const selectProvider = (provider: StorageProvider) => {
     setSelectedProvider(provider);
     setDrawerOpen(false);
   };
-
   const handleBackupClick = () => {
     setBackupDialogOpen(true);
   };
-
   const handleBackupDialogClose = () => {
     setBackupDialogOpen(false);
   };
-
   const handleBackupTargetChange = (event: SelectChangeEvent<StorageProvider>) => {
     setBackupTarget(event.target.value as StorageProvider);
   };
-
   const handleStartBackup = () => {
-    // Simulate backup process
     setBackupInProgress(true);
-    
-    // In a real app, this would connect to the device's storage and
-    // upload files to the selected cloud provider
     setTimeout(() => {
       setBackupInProgress(false);
       setBackupDialogOpen(false);
-      // Would show a success notification in a real app
     }, 3000);
   };
-
   const handleLogout = () => {
-    // Clear authentication from localStorage
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('googleAuth');
-    
-    // Close menu
     handleMenuClose();
-    
-    // Redirect to login page
     navigate('/login');
   };
-
-  // Render storage indicator with circular progress
   const renderStorageIndicator = (provider: StorageProvider) => {
     const data = storageDataByProvider[provider];
     const percentage = Math.round((data.used / data.total) * 100);
@@ -355,8 +322,8 @@ const MobileLayout: React.FC = () => {
         
         <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, overflow: 'hidden' }}>
           <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
+            value={tabValue} // Use prop value
+            onChange={onTabChange} // Use prop handler
             variant="fullWidth"
             sx={{ borderBottom: 1, borderColor: 'divider' }}
           >
@@ -366,10 +333,9 @@ const MobileLayout: React.FC = () => {
           </Tabs>
           
           <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+            {/* Render children passed from parent instead of conditional sections */}
             <Suspense fallback={<SectionLoader />}>
-              {tabValue === 0 && <PhotosSection />}
-              {tabValue === 1 && <VideosSection />}
-              {tabValue === 2 && <FilesSection />}
+              {children}
             </Suspense>
           </Box>
         </Box>
@@ -428,4 +394,4 @@ const MobileLayout: React.FC = () => {
   );
 };
 
-export default MobileLayout; 
+export default MobileLayout;

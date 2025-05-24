@@ -39,6 +39,10 @@ cd src/Frontend
 npm install
 npm start
 ```
+if that doesnt work, try
+```bash
+cd src/Frontend && NODE_OPTIONS=--openssl-legacy-provider npm start
+```
 
 ### Backend
 

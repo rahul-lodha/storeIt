@@ -2,11 +2,10 @@ import React, { createContext, useState, useMemo, useContext } from 'react';
 import { ThemeProvider, createTheme, CssBaseline, PaletteMode } from '@mui/material';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import MobileLayout from './components/MobileLayout';
 import Login from './pages/Login';
 import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
-import Storage from './pages/Storage';
+import Storage from './pages/Storage'; // Import Storage page
 
 // Create a theme context
 interface ThemeContextType {
@@ -24,11 +23,11 @@ export const useThemeContext = () => useContext(ThemeContext);
 // Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  
+
   if (!isLoggedIn) {
     return <Navigate to="/login" />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -78,7 +77,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/" element={
                 <ProtectedRoute>
-                  <MobileLayout />
+                  {/* Render Storage component for the root path */}
+                  <Storage />
                 </ProtectedRoute>
               } />
               <Route path="/settings" element={
@@ -91,11 +91,13 @@ function App() {
                   <Dashboard />
                 </ProtectedRoute>
               } />
+              {/* The /storage route might be redundant now if / is the main storage view */}
               <Route path="/storage" element={
                 <ProtectedRoute>
                   <Storage />
                 </ProtectedRoute>
               } />
+               {/* Consider if /admin should render Dashboard or a specific Admin component */}
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <Dashboard />

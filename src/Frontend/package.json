@@ -57,5 +57,6 @@
   },
   "config": {
     "prefix": "./dependencies"
-  }
+  },
+  "proxy": "http://localhost:8080"
 }
